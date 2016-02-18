@@ -2,3 +2,5 @@ composer.phar
 vendor/
 composer.lock
 /phpunit.xml
+
+tests/node_modules

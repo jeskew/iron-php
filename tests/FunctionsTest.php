@@ -27,4 +27,22 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase
             normalize_password($this->password->getPassword())->getPassword()
         );
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Passwords must be strings
+     */
+    public function testWillNotNormalizeInvalidPasswords()
+    {
+        normalize_password([]);
+    }
+
+    public function testCanSealAndUnsealStrings()
+    {
+        $plaintext = 'a string';
+        $sealed = seal($plaintext, $this->password);
+        $this->assertNotSame($plaintext, $sealed);
+
+        $this->assertSame($plaintext, unseal($sealed, $this->password));
+    }
 }
