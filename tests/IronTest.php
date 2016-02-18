@@ -11,7 +11,7 @@ class IronTest extends \PHPUnit_Framework_TestCase
         $this->password = new Password(str_repeat('x', Password::MIN_LENGTH));
     }
 
-    public function testCanSealAndUnsealStrings()
+    public function testCanEncryptAndDecryptStrings()
     {
         $plaintext = 'a string';
         $iron = new Iron;

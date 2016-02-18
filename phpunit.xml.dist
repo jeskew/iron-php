@@ -5,16 +5,18 @@
     <testsuites>
         <testsuite name="unit">
             <directory suffix="Test.php">tests/</directory>
+            <exclude>tests/node_modules</exclude>
+            <exclude>tests/InteropTest.php</exclude>
+        </testsuite>
+        <testsuite>
+            <directory suffix="InteropTest.php">tests/</directory>
+            <exclude>tests/node_modules</exclude>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
             <directory suffix=".php">src</directory>
-            <exclude>
-                <directory>src/data</directory>
-                <file>src/functions.php</file>
-            </exclude>
         </whitelist>
     </filter>
 </phpunit>

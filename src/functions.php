@@ -45,6 +45,13 @@ function unseal(
         ->decrypt($password, $sealed);
 }
 
+/**
+ * @param int $bytes
+ *
+ * @return string
+ *
+ * @codeCoverageIgnore
+ */
 function random_bytes($bytes)
 {
     if (function_exists('random_bytes')) {
@@ -115,6 +122,6 @@ function normalize_password($password)
         return $password;
     }
 
-    throw new Iae('Password must be strings or instances of'
+    throw new Iae('Passwords must be strings or instances of'
         . ' Jsq\\Iron\\PasswordInterface');
 }
