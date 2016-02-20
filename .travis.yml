@@ -14,6 +14,9 @@ matrix:
   fast_finish: true
 
 install:
+  - . $HOME/.nvm/nvm.sh
+  - nvm install stable
+  - nvm use stable
   - make install-test-deps
   - travis_retry composer update --no-interaction --prefer-source
 
