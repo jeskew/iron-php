@@ -6,6 +6,8 @@ php:
   - 7.0
   - hhvm
 
+sudo: false
+
 matrix:
   allow_failures:
     - php: hhvm
@@ -13,8 +15,6 @@ matrix:
 
 install:
   - make install-test-deps
-  - curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-  - sudo apt-get install -y nodejs
   - travis_retry composer update --no-interaction --prefer-source
 
 script:

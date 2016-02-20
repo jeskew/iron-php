@@ -8,11 +8,13 @@ class InteropTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        if (!`which node` || version_compare('4.0.0', trim(`node -v`), '<')) {
+        if (`which node`
+            && version_compare('4.0.0', substr(trim(`node -v`), 1), '<')
+        ) {
+            $this->password = new Password(str_repeat('x', Password::MIN_LENGTH));
+        } else {
             $this->markTestSkipped('Unable to run Node.js Iron library');
         }
-
-        $this->password = new Password(str_repeat('x', Password::MIN_LENGTH));
     }
 
     /**
@@ -25,7 +27,7 @@ class InteropTest extends \PHPUnit_Framework_TestCase
         $json = escapeshellarg(json_encode($toSeal));
         $password = $this->password->getPassword();
         $executable = __DIR__ . '/iron.js seal';
-        $sealed = trim(`node --harmony $executable $password $json`);
+        $sealed = trim(`node $executable $password $json`);
         $unsealed = unseal($sealed, $this->password);
 
         $this->assertSame($toSeal, json_decode($unsealed, true));
@@ -41,7 +43,7 @@ class InteropTest extends \PHPUnit_Framework_TestCase
         $sealed = seal(json_encode($toSeal), $this->password);
         $password = $this->password->getPassword();
         $executable = __DIR__ . '/iron.js unseal';
-        $unsealed = trim(`node --harmony $executable $password $sealed`);
+        $unsealed = trim(`node $executable $password $sealed`);
 
         $this->assertSame($toSeal, json_decode($unsealed, true));
     }
