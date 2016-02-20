@@ -13,7 +13,6 @@ class Iron
     private $keyProvider;
 
     /**
-     * Iron constructor.
      * @param string $encryptionMethod
      * @param callable|null $saltProvider
      * @param callable|null $keyProvider
@@ -64,13 +63,13 @@ class Iron
         $password = normalize_password($password);
         $token = Token::fromSealed($password, $data, $this->keyProvider);
 
-        return openssl_decrypt(
+        return json_decode(openssl_decrypt(
             $token->getCipherText(),
             $this->method,
             call_user_func($this->keyProvider, $password, $token->getSalt()),
             true,
             $token->getIv()
-        );
+        ), true);
     }
 
     private function generateCipherText(
@@ -80,7 +79,7 @@ class Iron
         $iv
     ) {
         return openssl_encrypt(
-            $data,
+            json_encode($data),
             $this->method,
             call_user_func($this->keyProvider, $password, $salt),
             true,

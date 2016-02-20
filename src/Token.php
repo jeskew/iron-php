@@ -41,7 +41,7 @@ final class Token
         $expiration = 0,
         callable $saltProvider = null,
         callable $keyGenerator = null
-    ){
+    ) {
         $this->password = $password;
         $this->salt = $salt;
         $this->iv = $iv;

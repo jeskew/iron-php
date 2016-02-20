@@ -9,7 +9,7 @@ class InteropTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         if (`which node`
-            && version_compare('4.0.0', substr(trim(`node -v`), 1), '<')
+            && -1 === version_compare('4.0.0', substr(trim(`node -v`), 1))
         ) {
             $this->password = new Password(str_repeat('x', Password::MIN_LENGTH));
         } else {
@@ -30,7 +30,7 @@ class InteropTest extends \PHPUnit_Framework_TestCase
         $sealed = trim(`node $executable $password $json`);
         $unsealed = unseal($sealed, $this->password);
 
-        $this->assertSame($toSeal, json_decode($unsealed, true));
+        $this->assertSame($toSeal, $unsealed);
     }
 
     /**
@@ -40,7 +40,7 @@ class InteropTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanSealTokensThatCanBeUnsealedByNodeJsIron($toSeal)
     {
-        $sealed = seal(json_encode($toSeal), $this->password);
+        $sealed = seal($toSeal, $this->password);
         $password = $this->password->getPassword();
         $executable = __DIR__ . '/iron.js unseal';
         $unsealed = trim(`node $executable $password $sealed`);
