@@ -6,10 +6,8 @@ use InvalidArgumentException as Iae;
 /**
  * @param string $data
  * @param string $password
- * @param int|null $ttl
+ * @param integer $ttl
  * @param string $cipherMethod
- * @param callable|null $saltProvider
- * @param callable|null $keyGenerator
  *
  * @return string
  */
@@ -17,31 +15,24 @@ function seal(
     $data,
     $password,
     $ttl = 0,
-    $cipherMethod = Iron::DEFAULT_ENCRYPTION_METHOD,
-    callable $saltProvider = null,
-    callable $keyGenerator = null
+    $cipherMethod = Iron::DEFAULT_ENCRYPTION_METHOD
 ) {
-    return (new Iron($cipherMethod, $saltProvider, $keyGenerator))
-        ->encrypt($password, $data, $ttl);
+    return (string) (new Iron($cipherMethod))->encrypt($password, $data, $ttl);
 }
 
 /**
  * @param string $sealed
  * @param string $password
  * @param string $cipherMethod
- * @param callable|null $saltProvider
- * @param callable|null $keyGenerator
  *
  * @return string
  */
 function unseal(
     $sealed,
     $password,
-    $cipherMethod = Iron::DEFAULT_ENCRYPTION_METHOD,
-    callable $saltProvider = null,
-    callable $keyGenerator = null
+    $cipherMethod = Iron::DEFAULT_ENCRYPTION_METHOD
 ) {
-    return (new Iron($cipherMethod, $saltProvider, $keyGenerator))
+    return (new Iron($cipherMethod))
         ->decrypt($password, $sealed);
 }
 
