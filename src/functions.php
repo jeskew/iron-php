@@ -74,16 +74,15 @@ function base64_decode($data)
 }
 
 /**
- * @param PasswordInterface $password
+ * @param PasswordInterface $p
  * @param string $salt
  * @param int $length
- * @param int $iterations
  *
  * @return bool|string
  */
-function generate_key(PasswordInterface $password, $salt, $length = 32, $iterations = 1)
+function generate_key(PasswordInterface $p, $salt, $length = 32)
 {
-    return openssl_pbkdf2($password->getPassword(), $salt, $length, $iterations);
+    return hash_pbkdf2('sha1', $p->getPassword(), $salt, 1, $length, true);
 }
 
 /**
