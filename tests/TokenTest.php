@@ -34,9 +34,9 @@ class TokenTest extends \PHPUnit_Framework_TestCase
 
     public function testWillUnsealIronTokenString()
     {
-        $token = (string) new Token($this->password, '', '', '');
+        $token = new Token($this->password, '', '', '');
 
-        Token::fromSealed($this->password, $token);
+        Token::fromSealed($this->password, (string) $token);
     }
 
     /**
@@ -70,9 +70,9 @@ class TokenTest extends \PHPUnit_Framework_TestCase
     {
         $passwordA = new Password(str_repeat('a', Password::MIN_LENGTH), 'a');
         $passwordB = new Password(str_repeat('b', Password::MIN_LENGTH), 'b');
-        $token = (string) new Token($passwordA, '', '', '');
+        $token = new Token($passwordA, '', '', '');
 
-        Token::fromSealed($passwordB, $token);
+        Token::fromSealed($passwordB, (string) $token);
     }
 
     /**

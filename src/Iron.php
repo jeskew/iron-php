@@ -7,24 +7,14 @@ class Iron
 
     /** @var string */
     private $method;
-    /** @var callable */
-    private $saltProvider;
-    /** @var callable */
-    private $keyProvider;
 
     /**
      * @param string $encryptionMethod
-     * @param callable|null $saltProvider
-     * @param callable|null $keyProvider
      */
     public function __construct(
-        $encryptionMethod = self::DEFAULT_ENCRYPTION_METHOD,
-        callable $saltProvider = null,
-        callable $keyProvider = null
+        $encryptionMethod = self::DEFAULT_ENCRYPTION_METHOD
     ) {
         $this->method = $encryptionMethod;
-        $this->saltProvider = $saltProvider ?: 'Jsq\\Iron\\generate_salt';
-        $this->keyProvider = $keyProvider ?: 'Jsq\\Iron\\generate_key';
     }
 
     /**
@@ -32,44 +22,55 @@ class Iron
      * @param string $data
      * @param int $ttl
      *
-     * @return string
+     * @return Token
      */
     public function encrypt($password, $data, $ttl = 0)
     {
         $password = normalize_password($password);
-        $salt = call_user_func($this->saltProvider);
+        $salt = generate_salt();
         $iv = random_bytes(openssl_cipher_iv_length($this->method));
-        $token = new Token(
+
+        return new Token(
             $password,
             $salt,
             $iv,
-            $this->generateCipherText($data, $password, $salt, $iv),
-            $ttl ? time() + $ttl : $ttl,
-            $this->saltProvider,
-            $this->keyProvider
+            $this->generateCipherText(json_encode($data), $password, $salt, $iv),
+            $ttl ? time() + $ttl : $ttl
         );
-
-        return (string) $token;
     }
 
     /**
      * @param string|PasswordInterface $password
-     * @param string $data
+     * @param string|Token $data
      *
      * @return string
      */
     public function decrypt($password, $data)
     {
         $password = normalize_password($password);
-        $token = Token::fromSealed($password, $data, $this->keyProvider);
+        $token = $this->normalizeToken($password, $data);
 
+        return $this->decryptToken($token, $password);
+    }
+
+    public function decryptToken(Token $token, PasswordInterface $password)
+    {
         return json_decode(openssl_decrypt(
             $token->getCipherText(),
             $this->method,
-            call_user_func($this->keyProvider, $password, $token->getSalt()),
+            generate_key($password, $token->getSalt()),
             true,
             $token->getIv()
         ), true);
+    }
+
+    private function normalizeToken(PasswordInterface $password, $token)
+    {
+        if ($token instanceof Token) {
+            return $token;
+        }
+
+        return Token::fromSealed($password, $token);
     }
 
     private function generateCipherText(
@@ -79,9 +80,9 @@ class Iron
         $iv
     ) {
         return openssl_encrypt(
-            json_encode($data),
+            $data,
             $this->method,
-            call_user_func($this->keyProvider, $password, $salt),
+            generate_key($password, $salt),
             true,
             $iv
         );
