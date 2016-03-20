@@ -115,3 +115,22 @@ function normalize_password($password)
     throw new Iae('Passwords must be strings or instances of'
         . ' Jsq\\Iron\\PasswordInterface');
 }
+
+function hash_equals($expected, $actual)
+{
+    if (function_exists('hash_equals')) {
+        return \hash_equals($expected, $actual);
+    }
+
+    if (strlen($expected) !== strlen($actual)) {
+        return false;
+    }
+
+    $result = $expected ^ $actual;
+    $return = 0;
+    for ($i = 0; $i < strlen($result); $i++) {
+        $return |= ord($result{$i});
+    }
+
+    return !$return;
+}
