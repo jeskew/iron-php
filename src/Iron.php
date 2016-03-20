@@ -7,14 +7,24 @@ class Iron
 
     /** @var string */
     private $method;
+    /** @var callable */
+    private $saltGenerator;
+    /** @var callable */
+    private $keyProvider;
 
     /**
      * @param string $encryptionMethod
+     * @param callable|null $keyProvider
+     * @param callable|null $saltGenerator
      */
     public function __construct(
-        $encryptionMethod = self::DEFAULT_ENCRYPTION_METHOD
+        $encryptionMethod = self::DEFAULT_ENCRYPTION_METHOD,
+        callable $keyProvider = null,
+        callable $saltGenerator = null
     ) {
         $this->method = $encryptionMethod;
+        $this->keyProvider = $keyProvider ?: 'Jsq\Iron\generate_key';
+        $this->saltGenerator = $saltGenerator ?: 'Jsq\Iron\generate_salt';
     }
 
     /**
@@ -27,7 +37,7 @@ class Iron
     public function encrypt($password, $data, $ttl = 0)
     {
         $password = normalize_password($password);
-        $salt = generate_salt();
+        $salt = call_user_func($this->saltGenerator);
         $iv = random_bytes(openssl_cipher_iv_length($this->method));
 
         return new Token(
@@ -35,7 +45,9 @@ class Iron
             $salt,
             $iv,
             $this->generateCipherText(json_encode($data), $password, $salt, $iv),
-            $ttl ? time() + $ttl : $ttl
+            $ttl ? time() + $ttl : $ttl,
+            $this->keyProvider,
+            $this->saltGenerator
         );
     }
 
@@ -58,7 +70,7 @@ class Iron
         return json_decode(openssl_decrypt(
             $token->getCipherText(),
             $this->method,
-            generate_key($password, $token->getSalt()),
+            call_user_func($this->keyProvider, $password, $token->getSalt()),
             true,
             $token->getIv()
         ), true);
@@ -70,7 +82,13 @@ class Iron
             return $token;
         }
 
-        return Token::fromSealed($password, $token);
+        return Token::fromSealed(
+            $password,
+            $token,
+            $validate = true,
+            $this->keyProvider,
+            $this->saltGenerator
+        );
     }
 
     private function generateCipherText(
@@ -82,7 +100,7 @@ class Iron
         return openssl_encrypt(
             $data,
             $this->method,
-            generate_key($password, $salt),
+            call_user_func($this->keyProvider, $password, $salt),
             true,
             $iv
         );

@@ -34,7 +34,7 @@ following exceptions:
 <?php
 
 use Jsq\Iron;
-use JSq\Iron\Password;
+use Jsq\Iron\Password;
 
 // payloads can be anything that can be serialized by json_encode
 $payload = ['an' => 'array']; 

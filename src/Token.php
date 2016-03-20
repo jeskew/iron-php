@@ -19,6 +19,10 @@ final class Token
     private $cipherText;
     /** @var int */
     private $expiration;
+    /** @var callable */
+    private $saltGenerator;
+    /** @var callable */
+    private $keyProvider;
 
     /**
      * @param PasswordInterface $password
@@ -26,32 +30,42 @@ final class Token
      * @param string $iv
      * @param string $cipherText
      * @param int $expiration
+     * @param callable|null $keyProvider
+     * @param callable|null $saltGenerator
      */
     public function __construct(
         PasswordInterface $password,
         $salt,
         $iv,
         $cipherText,
-        $expiration = 0
+        $expiration = 0,
+        callable $keyProvider = null,
+        callable $saltGenerator = null
     ) {
         $this->password = $password;
         $this->salt = $salt;
         $this->iv = $iv;
         $this->cipherText = $cipherText;
         $this->expiration = $expiration;
+        $this->keyProvider = $keyProvider ?: 'Jsq\Iron\generate_key';
+        $this->saltGenerator = $saltGenerator ?: 'Jsq\Iron\generate_salt';
     }
 
     /**
      * @param PasswordInterface $password
      * @param string $sealed
      * @param bool $validate
+     * @param callable|null $keyProvider
+     * @param callable|null $saltGenerator
      *
      * @return Token
      */
     public static function fromSealed(
         PasswordInterface $password,
         $sealed,
-        $validate = true
+        $validate = true,
+        callable $keyProvider = null,
+        callable $saltGenerator = null
     ) {
         $parts = explode('*', $sealed);
         if (count($parts) !== 8) {
@@ -74,7 +88,9 @@ final class Token
             $salt,
             base64_decode($iv),
             base64_decode($cipherText),
-            $ttd
+            $ttd,
+            $keyProvider,
+            $saltGenerator
         );
 
         if ($validate) {
