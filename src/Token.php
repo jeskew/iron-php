@@ -111,7 +111,7 @@ final class Token
             generate_key($this->password, $salt)
         );
 
-        if ($actualChecksum !== $expectedChecksum) {
+        if (!hash_equals($expectedChecksum, $actualChecksum)) {
             throw new InvalidTokenException('Invalid checksum.');
         }
     }
