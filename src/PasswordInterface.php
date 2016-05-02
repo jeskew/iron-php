@@ -3,7 +3,7 @@ namespace Jsq\Iron;
 
 interface PasswordInterface
 {
-    public function getPassword();
+    public function getPassword(): string;
 
-    public function getId();
+    public function getId(): string;
 }

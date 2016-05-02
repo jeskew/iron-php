@@ -35,9 +35,9 @@ final class Token
      */
     public function __construct(
         PasswordInterface $password,
-        $salt,
-        $iv,
-        $cipherText,
+        string $salt,
+        string $iv,
+        string $cipherText,
         $expiration = 0,
         callable $keyProvider = null,
         callable $saltGenerator = null
@@ -47,8 +47,8 @@ final class Token
         $this->iv = $iv;
         $this->cipherText = $cipherText;
         $this->expiration = $expiration;
-        $this->keyProvider = $keyProvider ?: 'Jsq\Iron\generate_key';
-        $this->saltGenerator = $saltGenerator ?: 'Jsq\Iron\generate_salt';
+        $this->keyProvider = $keyProvider ?: default_key_provider();
+        $this->saltGenerator = $saltGenerator ?: default_salt_generator();
     }
 
     /**
@@ -62,11 +62,11 @@ final class Token
      */
     public static function fromSealed(
         PasswordInterface $password,
-        $sealed,
-        $validate = true,
+        string $sealed,
+        bool $validate = true,
         callable $keyProvider = null,
         callable $saltGenerator = null
-    ) {
+    ): Token {
         $parts = explode('*', $sealed);
         if (count($parts) !== 8) {
             throw new InvalidTokenException('Invalid token structure.');
@@ -80,7 +80,12 @@ final class Token
         }
 
         if ($pwId !== $password->getId()) {
-            throw new PasswordMismatchException($password->getId(), $pwId, "Token encrypted with password $pwId; password {$password->getId()} provided for validation.");
+            throw new PasswordMismatchException(
+                $password->getId(), 
+                $pwId, 
+                "Token encrypted with password $pwId; password"
+                    . " {$password->getId()} provided for validation."
+            );
         }
 
         $token = new self(
@@ -105,7 +110,7 @@ final class Token
         return $token;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $stringToSign = $this->createStringToSign();
         $salt = generate_salt();
@@ -120,7 +125,7 @@ final class Token
         ]);
     }
 
-    public function validateChecksum($salt, $expectedChecksum)
+    public function validateChecksum(string $salt, string $expectedChecksum)
     {
         $actualChecksum = $this->authenticateToken(
             $this->createStringToSign(),
@@ -132,34 +137,22 @@ final class Token
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getPasswordId()
+    public function getPasswordId(): string 
     {
         return $this->password->getId();
     }
 
-    /**
-     * @return string
-     */
-    public function getSalt()
+    public function getSalt(): string
     {
         return $this->salt;
     }
 
-    /**
-     * @return string
-     */
-    public function getIv()
+    public function getIv(): string
     {
         return $this->iv;
     }
 
-    /**
-     * @return string
-     */
-    public function getCipherText()
+    public function getCipherText(): string 
     {
         return $this->cipherText;
     }
@@ -172,23 +165,18 @@ final class Token
         return $this->expiration ?: '';
     }
 
-    /**
-     * @param int $gracePeriod
-     *
-     * @return bool
-     */
-    public function isExpired($gracePeriod = 0)
+    public function isExpired(int $gracePeriod = 0): bool 
     {
         return is_numeric($this->getExpiration())
             && $this->getExpiration() < time() + $gracePeriod;
     }
 
-    private function authenticateToken($token, $key)
+    private function authenticateToken(string $token, string $key): string 
     {
         return base64_encode(hash_hmac(self::DIGEST_METHOD, $token, $key, true));
     }
 
-    private function createStringToSign()
+    private function createStringToSign(): string
     {
         return implode('*', [
             self::MAC_PREFIX . self::MAC_FORMAT_VERSION,

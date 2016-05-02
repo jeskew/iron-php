@@ -18,6 +18,9 @@ class IronTest extends \PHPUnit_Framework_TestCase
         $encrypted = $iron->encrypt($this->password, $plaintext);
         $this->assertNotSame($plaintext, $encrypted);
 
-        $this->assertSame($plaintext, $iron->decrypt($this->password, $encrypted));
+        $this->assertSame($plaintext, $iron->decryptToken(
+            Token::fromSealed($this->password, $encrypted),
+            $this->password
+        ));
     }
 }

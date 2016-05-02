@@ -10,13 +10,7 @@ final class Password implements PasswordInterface
     private $password;
     private $id;
 
-    /**
-     * @param string $password
-     * @param string $id
-     *
-     * @throws Iae If the password is of insufficient length.
-     */
-    public function __construct($password, $id = '')
+    public function __construct(string $password, string $id = '')
     {
         if (strlen($password) < self::MIN_LENGTH)
         {
@@ -28,18 +22,12 @@ final class Password implements PasswordInterface
         $this->id = $id;
     }
 
-    /**
-     * @return string
-     */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
