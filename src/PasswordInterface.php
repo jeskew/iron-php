@@ -1,5 +1,5 @@
 <?php
-namespace Jsq\Iron;
+namespace Iron;
 
 interface PasswordInterface
 {

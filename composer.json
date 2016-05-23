@@ -11,7 +11,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Jsq\\Iron\\": "src"
+      "Iron\\": "src"
     },
     "files": [
       "src/functions.php"

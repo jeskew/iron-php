@@ -1,5 +1,5 @@
 <?php
-namespace Jsq\Iron;
+namespace Iron;
 
 class InteropTest extends \PHPUnit_Framework_TestCase
 {

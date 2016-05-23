@@ -1,5 +1,5 @@
 <?php
-namespace Jsq\Iron;
+namespace Iron;
 
 class TokenTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,7 +40,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Jsq\Iron\InvalidTokenException
+     * @expectedException \Iron\InvalidTokenException
      * @expectedExceptionMessage Invalid token structure
      */
     public function testWillNotUnsealTokensWithoutSufficientParts()
@@ -52,7 +52,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Jsq\Iron\InvalidTokenException
+     * @expectedException \Iron\InvalidTokenException
      * @expectedExceptionMessage Invalid token version
      */
     public function testWillNotUnsealTokensWithDifferentVersion()
@@ -64,7 +64,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Jsq\Iron\PasswordMismatchException
+     * @expectedException \Iron\PasswordMismatchException
      */
     public function testWillNotUnsealTokensSealedWithDifferentPassword()
     {
@@ -76,7 +76,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Jsq\Iron\ExpiredTokenException
+     * @expectedException \Iron\ExpiredTokenException
      */
     public function testWillNotUnsealExpiredTokens()
     {

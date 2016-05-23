@@ -1,5 +1,5 @@
 <?php
-namespace Jsq\Iron;
+namespace Iron;
 
 use InvalidArgumentException as Iae;
 
@@ -129,5 +129,5 @@ function normalize_password($password): PasswordInterface
     }
 
     throw new Iae('Passwords must be strings or instances of'
-        . ' Jsq\\Iron\\PasswordInterface');
+        . ' Iron\\PasswordInterface');
 }

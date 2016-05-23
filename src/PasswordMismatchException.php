@@ -1,5 +1,5 @@
 <?php
-namespace Jsq\Iron;
+namespace Iron;
 
 use Exception;
 use InvalidArgumentException as Iae;

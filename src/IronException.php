@@ -1,7 +1,4 @@
 <?php
-namespace Jsq\Iron;
+namespace Iron;
 
-interface IronException
-{
-
-}
+interface IronException {}
